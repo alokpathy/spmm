@@ -12,7 +12,6 @@
   if( err != cudaSuccess ) {                        \
     printf("Test CUDA failure %s:%d '%s'\n",    \
         __FILE__,__LINE__,cudaGetErrorString(err)); \
-    return err;                           \
   }                                                 \
 } while(0)
 
@@ -21,15 +20,13 @@
   if (res != ncclSuccess) {                         \
     printf("Test NCCL failure %s:%d '%s'\n",    \
         __FILE__,__LINE__,ncclGetErrorString(res)); \
-    return res;                           \
   }                                                 \
 } while(0)
 
 using namespace std;
 
 void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
-    int size, rank;
-    MPI_Comm_size(MPI_COMM_WORLD, &size); 
+    int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     double *h_data = new double[n];
@@ -41,22 +38,33 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
         cudaMalloc(&d_data[i], n * sizeof(double));
     }
 
+    cudaSetDevice(0);
     if (rank == 0) {
         for (int i = 0; i < n; ++i) {
             h_data[i] = (double) i;
         }
         random_shuffle(h_data, h_data + n);
+
         cudaMemcpy(d_data[0], h_data, n * sizeof(double), cudaMemcpyHostToDevice);
     }
 
     // only works for ngpus=1
-    double t1 = MPI_Wtime();
-    ncclBroadcast(d_data[0], d_data[0], n * sizeof(double), ncclDouble, 0, comms[0], cudaStreamDefault);
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+
+    cudaEventRecord(start);
+    NCCLCHECK(ncclBroadcast(d_data[0], d_data[0], n * sizeof(double), ncclDouble, 0, comms[0], cudaStreamDefault));
     cudaDeviceSynchronize();
-    double t2 = MPI_Wtime();
-    double time = t2-t1;
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+
+    float time;
+    cudaEventElapsedTime(&time, start, stop);
+    int size = n * sizeof(double);
     double bandwidth = ((double)(n) * sizeof(double)) / time;
-    cout << "rank: " << rank << " time: " << time << " bw: " << bandwidth << "\n";
+    cout << "rank: " << rank << " size: " << size << " time: " << time << " bw: " << bandwidth << endl;
 }
 
 int main(int argc, char* argv[])
@@ -95,7 +103,9 @@ int main(int argc, char* argv[])
     }
     NCCLCHECK(ncclGroupEnd());
 
+    NCCLCHECK(ncclGroupStart());
     testBcast(ncclId, comms, n, ngpus);
+    NCCLCHECK(ncclGroupEnd());
     
     // // First do square grid 
     // int grcols = (int)std::sqrt((float)nprocs); 
@@ -144,9 +154,11 @@ int main(int argc, char* argv[])
     // DoAG(widerowcomm, n, widecolcomm);
     // DoAG(widecolcomm, n, widerowcomm);
 
+    printf("rank: %d before nccl free\n", rank); fflush(stdout);
     for (int i = 0; i < ngpus; i++) {
         NCCLCHECK(ncclCommDestroy(comms[i]));
     }
+    printf("rank: %d after nccl free\n", rank); fflush(stdout);
     free(comms);
     MPI_Finalize( );
     
