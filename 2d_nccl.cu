@@ -7,6 +7,8 @@
 #include "mpi.h"
 #include <nccl.h>
 
+#define DEVICES 6
+
 #define CUDACHECK(cmd) do {                         \
   cudaError_t err = cmd;                            \
   if( err != cudaSuccess ) {                        \
@@ -49,22 +51,53 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
     }
 
     // only works for ngpus=1
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
+    cudaEvent_t start[DEVICES];
+    cudaEvent_t stop[DEVICES];
+
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        cudaEventCreate(&start[i]);
+        cudaEventCreate(&stop[i]);
+        cudaDeviceSynchronize();
+    }
+    cudaStreamSynchronize(cudaStreamDefault);
 
 
-    cudaEventRecord(start);
-    NCCLCHECK(ncclBroadcast(d_data[0], d_data[0], n * sizeof(double), ncclDouble, 0, comms[0], cudaStreamDefault));
-    cudaDeviceSynchronize();
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        cudaEventRecord(start[i]);
+    }
 
-    float time;
-    cudaEventElapsedTime(&time, start, stop);
-    int size = n * sizeof(double);
-    double bandwidth = ((double)(n) * sizeof(double)) / time;
-    cout << "rank: " << rank << " size: " << size << " time: " << time << " bw: " << bandwidth << endl;
+    NCCLCHECK(ncclGroupStart());
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        NCCLCHECK(ncclBroadcast(d_data[0], d_data[i], n * sizeof(double), ncclDouble, 0, comms[i], cudaStreamDefault));
+    }
+    NCCLCHECK(ncclGroupEnd());
+
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        cudaDeviceSynchronize();
+    }
+    cudaStreamSynchronize(cudaStreamDefault);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        cudaEventRecord(stop[i]);
+        cudaEventSynchronize(stop[i]);
+    }
+
+    for (int i = 0; i < ngpus; i++) {
+        float time;
+        cudaSetDevice(i);
+        cudaEventElapsedTime(&time, start[i], stop[i]);
+        time /= 1000; // seconds
+        double size = n * sizeof(double);
+        double bandwidth = ((double)(n) * sizeof(double)) / time;
+        cout << "rank: " << rank << " gpu: " << i << " size: " << size << " time: " << time << " bw: " << bandwidth << endl;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -88,6 +121,10 @@ int main(int argc, char* argv[])
     MPI_Init( 0, 0 );
     MPI_Comm_size( MPI_COMM_WORLD, &nprocs); 
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
+
+    int devcount = 0;
+    cudaGetDeviceCount(&devcount);
+    std::cout << "rank: " << rank << " devcount: " << devcount << std::endl;
 
     ncclUniqueId ncclId;
     if (rank == 0) {
@@ -154,12 +191,10 @@ int main(int argc, char* argv[])
     // DoAG(widerowcomm, n, widecolcomm);
     // DoAG(widecolcomm, n, widerowcomm);
 
-    printf("rank: %d before nccl free\n", rank); fflush(stdout);
-    for (int i = 0; i < ngpus; i++) {
-        NCCLCHECK(ncclCommDestroy(comms[i]));
-    }
-    printf("rank: %d after nccl free\n", rank); fflush(stdout);
-    free(comms);
+    // for (int i = 0; i < ngpus; i++) {
+    //     NCCLCHECK(ncclCommDestroy(comms[i]));
+    // }
+    // free(comms);
     MPI_Finalize( );
     
     return 0;
