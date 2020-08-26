@@ -13,6 +13,9 @@ def main():
         datasize = -1
         bandwidths = []
         for line in f:
+            if "Success" in line:
+                continue
+
             tokens = line.strip().split()
             if len(tokens) == 1:
                 if datasize != -1:
