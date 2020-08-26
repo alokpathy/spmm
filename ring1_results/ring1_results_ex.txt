@@ -1,0 +1,99 @@
+5
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+[MPI Rank 3] Success 
+[MPI Rank 2] Success 
+6
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 2] Success 
+[MPI Rank 1] Success 
+[MPI Rank 3] Success 
+7
+rank: 0 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+[MPI Rank 2] Success 
+[MPI Rank 3] Success 
+8
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0.01 bw: 2.56e+07
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+[MPI Rank 2] Success 
+[MPI Rank 3] Success 
+9
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 2] Success 
+[MPI Rank 1] Success 
+[MPI Rank 3] Success 
+10
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 1] Success 
+[MPI Rank 2] Success 
+[MPI Rank 0] Success 
+[MPI Rank 3] Success 
+11
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 2] Success 
+[MPI Rank 1] Success 
+[MPI Rank 3] Success 
+12
+rank: 0 time: 0 bw: inf
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 1] Success 
+[MPI Rank 0] Success 
+[MPI Rank 2] Success 
+[MPI Rank 3] Success 
+13
+rank: 0 time: 0.01 bw: 8.192e+08
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 2] Success 
+[MPI Rank 1] Success 
+[MPI Rank 0] Success 
+[MPI Rank 3] Success 
+14
+rank: 0 time: 0.01 bw: 1.6384e+09
+rank: 1 time: 0 bw: inf
+rank: 2 time: 0.01 bw: 1.6384e+09
+rank: 3 time: 0 bw: inf
+[MPI Rank 2] Success 
+[MPI Rank 0] Success 
+[MPI Rank 3] Success 
+[MPI Rank 1] Success 
+15
+rank: 0 time: 0.01 bw: 3.2768e+09
+rank: 1 time: 0.02 bw: 1.6384e+09
+rank: 2 time: 0 bw: inf
+rank: 3 time: 0 bw: inf
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+[MPI Rank 2] Success 
+[MPI Rank 3] Success 

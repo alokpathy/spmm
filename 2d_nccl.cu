@@ -45,9 +45,10 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
         for (int i = 0; i < n; ++i) {
             h_data[i] = (double) i;
         }
-        random_shuffle(h_data, h_data + n);
+        // random_shuffle(h_data, h_data + n);
 
         cudaMemcpy(d_data[0], h_data, n * sizeof(double), cudaMemcpyHostToDevice);
+        cout << "rank: " << rank << " gpu: " << h_data[0] << " " << h_data[1] << " " << h_data[2] << std::endl;
     }
 
     // only works for ngpus=1
@@ -62,6 +63,8 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
     }
     cudaStreamSynchronize(cudaStreamDefault);
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
 
     for (int i = 0; i < ngpus; i++) {
         cudaSetDevice(i);
@@ -71,7 +74,7 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
     NCCLCHECK(ncclGroupStart());
     for (int i = 0; i < ngpus; i++) {
         cudaSetDevice(i);
-        NCCLCHECK(ncclBroadcast(d_data[0], d_data[i], n * sizeof(double), ncclDouble, 0, comms[i], cudaStreamDefault));
+        NCCLCHECK(ncclBroadcast((void*) d_data[0], (void*)d_data[i], n * sizeof(double), ncclDouble, 0, comms[i], cudaStreamDefault));
     }
     NCCLCHECK(ncclGroupEnd());
 
@@ -98,6 +101,17 @@ void testBcast(ncclUniqueId id, ncclComm_t *comms, int n, int ngpus) {
         double bandwidth = ((double)(n) * sizeof(double)) / time;
         cout << "rank: " << rank << " gpu: " << i << " size: " << size << " time: " << time << " bw: " << bandwidth << endl;
     }
+
+    // Test to see if data has been received
+    double *h_data_test = new double[n];
+    for (int i = 0; i < ngpus; i++) {
+        cudaSetDevice(i);
+        cudaMemcpy(h_data_test, d_data[i], n * sizeof(double), cudaMemcpyDeviceToHost);
+        
+        cout << "rank: " << rank << " gpu: " << h_data_test[0] << " " << h_data_test[1] << " " << h_data_test[2] << std::endl;
+    }
+
+    delete []h_data;
 }
 
 int main(int argc, char* argv[])
