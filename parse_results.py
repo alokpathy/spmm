@@ -23,7 +23,7 @@ def main():
                     max_bw = max(bandwidths)
                     avg_bw = sum(bandwidths) / len(bandwidths)
                     med_bw = statistics.median(bandwidths)
-                    print(f"{2**datasize * 10000},{min_bw},{max_bw},{avg_bw},{med_bw}")
+                    print(f"{2**datasize * 1000},{min_bw},{max_bw},{avg_bw},{med_bw}")
                     bandwidths = []
 
                 datasize = int(tokens[0])

@@ -1,0 +1,10 @@
+9
+rank: 0 gpu: 0 size: 2048000 time: 5.0496e-05 bw: 1.01394e+10
+rank: 0 gpu: 1 size: 2048000 time: 6.0992e-05 bw: 8.39454e+09
+rank: 0 gpu: 2 size: 2048000 time: 7.6768e-05 bw: 6.66945e+09
+[MPI Rank 0] Success 
+10
+rank: 0 gpu: 0 size: 4096000 time: 7.9328e-05 bw: 1.29084e+10
+rank: 0 gpu: 1 size: 4096000 time: 0.00010256 bw: 9.9844e+09
+rank: 0 gpu: 2 size: 4096000 time: 0.000116 bw: 8.82759e+09
+[MPI Rank 0] Success 

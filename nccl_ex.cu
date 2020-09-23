@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 
   float *h_data = new float[n]();
   for (int i = 0; i < n; i++) {
-    h_data[i] = 1.0f;
+    h_data[i] = 5.0f;
   }
 
   // Initialize send/receive buffers, streams, and timers
@@ -106,14 +106,16 @@ int main(int argc, char** argv) {
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
-  NCCLCHECK(ncclGroupStart());
-  for (int i = 0; i < ngpus; i++) {
-    CUDACHECK(cudaEventRecord(start[i], s[i]));
-    NCCLCHECK(ncclBroadcast((const void*)sendbuff[0], (void*)recvbuff[i], n, ncclFloat, 0,
-        comms[i], s[i]));
+  for (int j = 0; j < 5; j++) {
+      // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
+      NCCLCHECK(ncclGroupStart());
+      for (int i = 0; i < ngpus; i++) {
+        CUDACHECK(cudaEventRecord(start[i], s[i]));
+        NCCLCHECK(ncclBroadcast((const void*)sendbuff[0], (void*)recvbuff[i], n, ncclFloat, 0,
+            comms[i], s[i]));
+      }
+      NCCLCHECK(ncclGroupEnd());
   }
-  NCCLCHECK(ncclGroupEnd());
 
   // Synchronizing on CUDA stream to complete NCCL communication.
   for (int i = 0; i < ngpus; i++) {
@@ -134,7 +136,7 @@ int main(int argc, char** argv) {
 
     cudaMemcpy(h_recvbuff, recvbuff[i], n * sizeof(float), cudaMemcpyDeviceToHost);
     for (int j = 0; j < n; j++) {
-      if (h_recvbuff[i] != 1.0f) {
+      if (h_recvbuff[i] != 5.0f) {
         std::cout << "bcast error" << std::endl;
       }
     }

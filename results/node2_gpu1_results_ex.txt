@@ -1,0 +1,30 @@
+5
+rank: 0 gpu: 0 size: 128000 time: 3.1008e-05 bw: 1.03199e+09
+rank: 1 gpu: 0 size: 128000 time: 3.072e-05 bw: 1.04167e+09
+[MPI Rank 1] Success 
+[MPI Rank 0] Success 
+6
+rank: 1 gpu: 0 size: 256000 time: 3.4016e-05 bw: 1.88147e+09
+rank: 0 gpu: 0 size: 256000 time: 3.3504e-05 bw: 1.91022e+09
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+7
+rank: 0 gpu: 0 size: 512000 time: 3.872e-05 bw: 3.30579e+09
+rank: 1 gpu: 0 size: 512000 time: 3.9456e-05 bw: 3.24412e+09
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+8
+rank: 0 gpu: 0 size: 1024000 time: 5.0976e-05 bw: 5.02197e+09
+rank: 1 gpu: 0 size: 1024000 time: 5.0272e-05 bw: 5.0923e+09
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+9
+rank: 0 gpu: 0 size: 2048000 time: 7.52e-05 bw: 6.80851e+09
+rank: 1 gpu: 0 size: 2048000 time: 8.0608e-05 bw: 6.35173e+09
+[MPI Rank 0] Success 
+[MPI Rank 1] Success 
+10
+rank: 1 gpu: 0 size: 4096000 time: 0.000125856 bw: 8.13628e+09
+rank: 0 gpu: 0 size: 4096000 time: 0.000120928 bw: 8.46785e+09
+[MPI Rank 1] Success 
+[MPI Rank 0] Success 
