@@ -6,9 +6,6 @@
 #include <unistd.h>
 #include <stdint.h>
 
-// #define CPUTIME
-#define GPUTIME
-
 #define MPICHECK(cmd) do {                          \
   int e = cmd;                                      \
   if( e != MPI_SUCCESS ) {                          \
@@ -111,7 +108,7 @@ int main(int argc, char** argv) {
   // float *h_data = new float[n]();
   double *h_data = new double[n]();
   for (int i = 0; i < n; i++) {
-    h_data[i] = (double) (rank / procdim);
+    h_data[i] = (double) (5.0);
   }
 
   // Initialize send/receive buffers, streams, and timers
@@ -188,75 +185,45 @@ int main(int argc, char** argv) {
   MPI_Barrier(mpi_new_world);
 
   // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
-  CUDACHECK(cudaEventRecord(start[0], s[0]));
-  CUDACHECK(cudaEventRecord(start[1], s[1]));
-  CUDACHECK(cudaEventRecord(start[2], cudaStreamDefault));
-  // CUDACHECK(cudaEventRecord(start[0], cudaStreamDefault));
-  // CUDACHECK(cudaEventRecord(start[1], cudaStreamDefault));
+  CUDACHECK(cudaEventRecord(start[2], 0));
   
   // 2D SUMMA
-  int trials = 20;
-#ifdef CPUTIME
-  double row_time = 0.0;
-  double col_time = 0.0;
-  clock_t tstart = clock();
-#endif
+  int trials = 5;
+  float row_time = 0.0;
+  float col_time = 0.0;
+
   // NCCLCHECK(ncclGroupStart());
   for (int k = 0; k < trials; k++) {
     for (int i = 0; i < procdim; i++) {
-      // NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclFloat, 0, comms[0], cudaStreamDefault));
-      // NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclFloat, 0, comms[1], cudaStreamDefault));
-      // NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclFloat, 0, comms[0], s[0]));
-      // NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclFloat, 0, comms[1], s[1]));
 
-#ifdef CPUTIME
-      clock_t tstart_row = clock();
-#endif
-      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[0], s[0]));
-#ifdef CPUTIME
+      CUDACHECK(cudaEventRecord(start[0], 0));
+      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[0], 0));
       cudaDeviceSynchronize();
-      clock_t tstop_row = clock();
-      row_time += ((double)(tstop_row - tstart_row)) / CLOCKS_PER_SEC;
-#endif
+      CUDACHECK(cudaEventRecord(stop[0], 0));
 
-#ifdef CPUTIME
-      clock_t tstart_col = clock();
-#endif
-      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[1], s[1]));
-#ifdef CPUTIME
+      float row_bcast_time;
+      CUDACHECK(cudaEventElapsedTime(&row_bcast_time, start[0], stop[0]));
+      CUDACHECK(cudaEventSynchronize(stop[0]));
+      row_time += row_bcast_time / 1000;
+
+      CUDACHECK(cudaEventRecord(start[1], 0));
+      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[1], 0));
       cudaDeviceSynchronize();
-      clock_t tstop_col = clock();
-      col_time += ((double)(tstop_col - tstart_col)) / CLOCKS_PER_SEC;
-#endif
+      CUDACHECK(cudaEventRecord(stop[1], 0));
+
+      float col_bcast_time;
+      CUDACHECK(cudaEventElapsedTime(&col_bcast_time, start[1], stop[1]));
+      CUDACHECK(cudaEventSynchronize(stop[1]));
+      col_time += col_bcast_time / 1000;
     }
   }
   // NCCLCHECK(ncclGroupEnd());
 
-#ifdef GPUTIME
-  CUDACHECK(cudaEventRecord(stop[0], s[0]));
-  CUDACHECK(cudaEventRecord(stop[1], s[1]));
-
-  CUDACHECK(cudaStreamSynchronize(s[0]));
-  CUDACHECK(cudaStreamSynchronize(s[1]));
-  CUDACHECK(cudaEventRecord(stop[2], cudaStreamDefault));
-  // CUDACHECK(cudaEventRecord(stop[0], cudaStreamDefault));
-  // CUDACHECK(cudaEventRecord(stop[1], cudaStreamDefault));
+  CUDACHECK(cudaEventRecord(stop[2], 0));
   CUDACHECK(cudaEventSynchronize(stop[0]));
   CUDACHECK(cudaEventSynchronize(stop[1]));
   CUDACHECK(cudaEventSynchronize(stop[2]));
-#endif
 
-#ifdef CPUTIME
-  cudaDeviceSynchronize();
-  clock_t tstop = clock();
-  double cpu_time = ((double)(tstop - tstart))/CLOCKS_PER_SEC; // in seconds
-
-  std::cout << "rank: " << rank << " cpu_time: " << cpu_time << " overall_bw: " << ((procdim * n * sizeof(double) * trials) / cpu_time) << std::endl;
-  std::cout << "rank: " << rank << " row_time: " << row_time << " row_bw: " << ((procdim * n * sizeof(double) * trials) / row_time) << std::endl;
-  std::cout << "rank: " << rank << " col_time: " << col_time << " col_bw: " << ((procdim * n * sizeof(double) * trials) / col_time) << std::endl;
-#endif
-
-#ifdef GPUTIME
   // Collect timings and verify broadcast worked.
   // float *h_recvbuff = new float[n]();
   double *h_recvbuff = new double[n]();
@@ -268,20 +235,17 @@ int main(int argc, char** argv) {
   time_col /= 1000; // seconds
   gpu_time /= 1000; // seconds
 
-  // cudaMemcpy(h_recvbuff, recvbuff, n * sizeof(float), cudaMemcpyDeviceToHost);
   cudaMemcpy(h_recvbuff, recvbuff, n * sizeof(double), cudaMemcpyDeviceToHost);
   for (int i = 0; i < n; i++) {
-    if (h_recvbuff[i] != (double)(procdim - 1)) {
+    if (h_recvbuff[i] != (double)(5.0)) {
       std::cout << "bcast error " << h_recvbuff[i] << " " << (procdim - 1) << std::endl;
       exit(0);
     }
   }
-  // std::cout << "rank: " << rank << " size: " << (n * sizeof(float)) << " time_row: " << time_row << " bw: " << ((2 * procdim * n * sizeof(float) * trials) / time_row) << std::endl;
-  // std::cout << "rank: " << rank << " size: " << (n * sizeof(float)) << " time_col: " << time_col << " bw: " << ((procdim * n * sizeof(float) * trials) / time_col) << std::endl;
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " gpu_time: " << gpu_time << " bw: " << ((procdim * n * sizeof(double) * trials) / gpu_time) << std::endl;
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " time_row: " << time_row << " bw: " << ((procdim * n * sizeof(double) * trials) / time_row) << std::endl;
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " time_col: " << time_col << " bw: " << ((procdim * n * sizeof(double) * trials) / time_col) << std::endl;
-#endif
+
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " gpu_time: " << gpu_time << " bw: " << ((2 * procdim * n * sizeof(double) * trials) / gpu_time) << std::endl;
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " row_time: " << row_time << " bw: " << ((procdim * n * sizeof(double) * trials) / row_time) << std::endl;
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " col_time: " << col_time << " bw: " << ((procdim * n * sizeof(double) * trials) / col_time) << std::endl;
 
   // Freeing device memory
   CUDACHECK(cudaFree(sendbuff));

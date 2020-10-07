@@ -2,18 +2,19 @@ import statistics
 import sys
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: python {sys.argv[0]} <filename>")
+    if len(sys.argv) != 3:
+        print(f"Usage: python {sys.argv[0]} <filename> <bwtype>")
         return
 
     filename = sys.argv[1]
+    bwtype = sys.argv[2]
 
     print(f"data,min,max,avg,median")
     with open(filename) as f:
         datasize = -1
         bandwidths = []
         for line in f:
-            if "Success" in line:
+            if "Success" in line or "Hostname" in line or "Warning" in line:
                 continue
 
             tokens = line.strip().split()
@@ -27,7 +28,7 @@ def main():
                     bandwidths = []
 
                 datasize = int(tokens[0])
-            else:
+            elif "{}_time:".format(bwtype) in line:
                 bandwidth = float(tokens[-1])
                 bandwidths.append(bandwidth)
     

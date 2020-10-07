@@ -1,8 +1,15 @@
 nvcc -I$MPI_ROOT/include -L$MPI_ROOT/lib -lmpi_ibm -lnccl nccl_ex_2d.cu -o nccl_ex_2d
 
 nodecount=$1
+procdim=$2
 
 echo -n "" > results/node$nodecount\_gpu1_results_ex.txt
+for i in {5..18}
+    do
+        echo $i
+        echo $i >> nccl_2d_bcast_results/proc$nodecount\.txt
+        jsrun -n$procdim -a6 -g6 ./nccl_ex_2d $(echo 2^$i | bc) 1 $nodecount >> nccl_2d_bcast_results/proc$nodecount\.txt
+    done
 
 # # nvcc -I$MPI_ROOT/include -L$MPI_ROOT/lib -lmpi_ibm -lnccl 2d_nccl.cu -o 2d_nccl 
 # nvcc -I$MPI_ROOT/include -L$MPI_ROOT/lib -lmpi_ibm -lnccl nccl_ex.cu -o nccl_ex
