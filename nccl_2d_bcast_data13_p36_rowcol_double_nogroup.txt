@@ -1,0 +1,145 @@
+Warning: more than 1 task/rank assigned to a core
+rank: 4, Hostname: h32n04
+rank: 4 size: 65536000 time_row: 2.77452 bw: 5.66897e+09
+rank: 4 size: 65536000 time_col: 2.77452 bw: 2.83448e+09
+rank: 16, Hostname: h34n17
+rank: 16 size: 65536000 time_row: 2.78873 bw: 5.64006e+09
+rank: 16 size: 65536000 time_col: 2.78874 bw: 2.82003e+09
+rank: 22, Hostname: h34n18
+rank: 22 size: 65536000 time_row: 2.79754 bw: 5.6223e+09
+rank: 22 size: 65536000 time_col: 2.79755 bw: 2.81115e+09
+rank: 34, Hostname: h35n11
+rank: 34 size: 65536000 time_row: 2.81951 bw: 5.57851e+09
+rank: 34 size: 65536000 time_col: 2.81951 bw: 2.78925e+09
+rank: 10, Hostname: h32n08
+rank: 10 size: 65536000 time_row: 2.77708 bw: 5.66374e+09
+rank: 10 size: 65536000 time_col: 2.77708 bw: 2.83187e+09
+rank: 28, Hostname: h35n10
+rank: 28 size: 65536000 time_row: 2.73089 bw: 5.75953e+09
+rank: 28 size: 65536000 time_col: 2.73089 bw: 2.87976e+09
+rank: 1, Hostname: h32n04
+rank: 1 size: 65536000 time_row: 3.34684 bw: 4.69954e+09
+rank: 1 size: 65536000 time_col: 3.34685 bw: 2.34977e+09
+rank: 13, Hostname: h34n17
+rank: 13 size: 65536000 time_row: 3.38479 bw: 4.64686e+09
+rank: 13 size: 65536000 time_col: 3.38479 bw: 2.32343e+09
+rank: 7, Hostname: h32n08
+rank: 7 size: 65536000 time_row: 3.37114 bw: 4.66568e+09
+rank: 7 size: 65536000 time_col: 3.37114 bw: 2.33284e+09
+rank: 25, Hostname: h35n10
+rank: 25 size: 65536000 time_row: 3.38268 bw: 4.64976e+09
+rank: 25 size: 65536000 time_col: 3.38268 bw: 2.32488e+09
+rank: 31, Hostname: h35n11
+rank: 31 size: 65536000 time_row: 3.39699 bw: 4.63017e+09
+rank: 31 size: 65536000 time_col: 3.39699 bw: 2.31508e+09
+rank: 9, Hostname: h32n08
+rank: 9 size: 65536000 time_row: 3.52423 bw: 4.46301e+09
+rank: 9 size: 65536000 time_col: 3.52423 bw: 2.2315e+09
+rank: 3, Hostname: h32n04
+rank: 3 size: 65536000 time_row: 3.52133 bw: 4.46667e+09
+rank: 3 size: 65536000 time_col: 3.52133 bw: 2.23334e+09
+rank: 27, Hostname: h35n10
+rank: 27 size: 65536000 time_row: 3.56417 bw: 4.41299e+09
+rank: 27 size: 65536000 time_col: 3.56417 bw: 2.20649e+09
+rank: 21, Hostname: h34n18
+rank: 21 size: 65536000 time_row: 3.57532 bw: 4.39923e+09
+rank: 21 size: 65536000 time_col: 3.57532 bw: 2.19961e+09
+rank: 12, Hostname: h34n17
+rank: 12 size: 65536000 time_row: 3.61479 bw: 4.35119e+09
+rank: 12 size: 65536000 time_col: 3.61479 bw: 2.17559e+09
+rank: 8, Hostname: h32n08
+rank: 8 size: 65536000 time_row: 3.53024 bw: 4.45541e+09
+rank: 8 size: 65536000 time_col: 3.53024 bw: 2.2277e+09
+rank: 24, Hostname: h35n10
+rank: 24 size: 65536000 time_row: 3.58814 bw: 4.38351e+09
+rank: 24 size: 65536000 time_col: 3.58814 bw: 2.19175e+09
+rank: 19, Hostname: h34n18
+rank: 19 size: 65536000 time_row: 3.40984 bw: 4.61273e+09
+rank: 19 size: 65536000 time_col: 3.40984 bw: 2.30636e+09
+rank: 2, Hostname: h32n04
+rank: 2 size: 65536000 time_row: 3.50436 bw: 4.48831e+09
+rank: 2 size: 65536000 time_col: 3.50436 bw: 2.24415e+09
+rank: 14, Hostname: h34n17
+rank: 14 size: 65536000 time_row: 3.5322 bw: 4.45293e+09
+rank: 14 size: 65536000 time_col: 3.5322 bw: 2.22646e+09
+rank: 15, Hostname: h34n17
+rank: 15 size: 65536000 time_row: 3.53517 bw: 4.44919e+09
+rank: 15 size: 65536000 time_col: 3.53517 bw: 2.22459e+09
+rank: 0, Hostname: h32n04
+rank: 0 size: 65536000 time_row: 3.59696 bw: 4.37276e+09
+rank: 0 size: 65536000 time_col: 3.59696 bw: 2.18638e+09
+rank: 26, Hostname: h35n10
+rank: 26 size: 65536000 time_row: 3.54005 bw: 4.44306e+09
+rank: 26 size: 65536000 time_col: 3.54005 bw: 2.22153e+09
+rank: 18, Hostname: h34n18
+rank: 18 size: 65536000 time_row: 3.61333 bw: 4.35294e+09
+rank: 18 size: 65536000 time_col: 3.61334 bw: 2.17647e+09
+rank: 6, Hostname: h32n08
+rank: 6 size: 65536000 time_row: 3.59573 bw: 4.37426e+09
+rank: 6 size: 65536000 time_col: 3.59573 bw: 2.18713e+09
+rank: 32, Hostname: h35n11
+rank: 32 size: 65536000 time_row: 3.55554 bw: 4.4237e+09
+rank: 32 size: 65536000 time_col: 3.55555 bw: 2.21185e+09
+rank: 20, Hostname: h34n18
+rank: 20 size: 65536000 time_row: 3.57004 bw: 4.40573e+09
+rank: 20 size: 65536000 time_col: 3.57004 bw: 2.20286e+09
+rank: 33, Hostname: h35n11
+rank: 33 size: 65536000 time_row: 3.60733 bw: 4.36019e+09
+rank: 33 size: 65536000 time_col: 3.60733 bw: 2.18009e+09
+rank: 5, Hostname: h32n04
+rank: 5 size: 65536000 time_row: 3.689 bw: 4.26366e+09
+rank: 5 size: 65536000 time_col: 3.68901 bw: 2.13183e+09
+rank: 30, Hostname: h35n11
+rank: 30 size: 65536000 time_row: 3.63118 bw: 4.33155e+09
+rank: 30 size: 65536000 time_col: 3.63118 bw: 2.16578e+09
+rank: 17, Hostname: h34n17
+rank: 17 size: 65536000 time_row: 3.73115 bw: 4.21549e+09
+rank: 17 size: 65536000 time_col: 3.73116 bw: 2.10774e+09
+rank: 29, Hostname: h35n10
+rank: 29 size: 65536000 time_row: 3.71454 bw: 4.23434e+09
+rank: 29 size: 65536000 time_col: 3.71455 bw: 2.11717e+09
+rank: 35, Hostname: h35n11
+rank: 35 size: 65536000 time_row: 3.74442 bw: 4.20056e+09
+rank: 35 size: 65536000 time_col: 3.74442 bw: 2.10028e+09
+rank: 11, Hostname: h32n08
+rank: 11 size: 65536000 time_row: 3.72847 bw: 4.21853e+09
+rank: 11 size: 65536000 time_col: 3.72847 bw: 2.10926e+09
+rank: 23, Hostname: h34n18
+rank: 23 size: 65536000 time_row: 3.71005 bw: 4.23947e+09
+rank: 23 size: 65536000 time_col: 3.71005 bw: 2.11973e+09
+[MPI Rank 26] Success 
+[MPI Rank 25] Success 
+[MPI Rank 9] Success 
+[MPI Rank 24] Success 
+[MPI Rank 16] Success 
+[MPI Rank 14] Success 
+[MPI Rank 15] Success 
+[MPI Rank 4] Success 
+[MPI Rank 1] Success 
+[MPI Rank 31] Success 
+[MPI Rank 33] Success 
+[MPI Rank 34] Success 
+[MPI Rank 2] Success 
+[MPI Rank 22] Success 
+[MPI Rank 30] Success 
+[MPI Rank 0] Success 
+[MPI Rank 5] Success 
+[MPI Rank 3] Success 
+[MPI Rank 6] Success 
+[MPI Rank 7] Success 
+[MPI Rank 11] Success 
+[MPI Rank 18] Success 
+[MPI Rank 20] Success 
+[MPI Rank 19] Success 
+[MPI Rank 21] Success 
+[MPI Rank 8] Success 
+[MPI Rank 10] Success 
+[MPI Rank 12] Success 
+[MPI Rank 17] Success 
+[MPI Rank 13] Success 
+[MPI Rank 23] Success 
+[MPI Rank 32] Success 
+[MPI Rank 35] Success 
+[MPI Rank 27] Success 
+[MPI Rank 29] Success 
+[MPI Rank 28] Success 

@@ -39,7 +39,7 @@
 int main(int argc, char** argv) {
 
   if(argc < 3) {
-      std::cout << "Please specify the number of vertices (data size) in thousands and number of gpus per node";
+      std::cout << "Please specify the number of data size in thousands and number of gpus per node";
       return 0;
   }
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  for (int j = 0; j < 5; j++) {
+  for (int j = 0; j < 1; j++) {
       // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
       NCCLCHECK(ncclGroupStart());
       for (int i = 0; i < ngpus; i++) {
@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
         std::cout << "bcast error" << std::endl;
       }
     }
-    std::cout << "rank: " << rank << " gpu: " << i << " size: " << (n * sizeof(float)) << " time: " << time << " bw: " << (n / time) << std::endl;
+    std::cout << "rank: " << rank << " gpu: " << i << " size: " << (n * sizeof(float)) << " time: " << time << " bw: " << ((n * sizeof(float)) / time) << std::endl;
   } 
 
   // Freeing device memory
