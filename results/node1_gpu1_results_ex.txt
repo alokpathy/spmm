@@ -1,6 +1,0 @@
-9
-rank: 0 gpu: 0 size: 2048000 time: 2.16e-05 bw: 2.37037e+10
-[MPI Rank 0] Success 
-10
-rank: 0 gpu: 0 size: 4096000 time: 2.6944e-05 bw: 3.80047e+10
-[MPI Rank 0] Success 

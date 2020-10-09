@@ -188,36 +188,40 @@ int main(int argc, char** argv) {
   CUDACHECK(cudaEventRecord(start[2], 0));
   
   // 2D SUMMA
-  int trials = 5;
+  int trials = 20;
   float row_time = 0.0;
   float col_time = 0.0;
 
-  // NCCLCHECK(ncclGroupStart());
-  for (int k = 0; k < trials; k++) {
-    for (int i = 0; i < procdim; i++) {
+  for (int i = 0; i < procdim; i++) {
 
-      CUDACHECK(cudaEventRecord(start[0], 0));
+    CUDACHECK(cudaEventRecord(start[0], 0));
+    NCCLCHECK(ncclGroupStart());
+    for (int j = 0; j < trials; j++) {
       NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[0], 0));
-      cudaDeviceSynchronize();
-      CUDACHECK(cudaEventRecord(stop[0], 0));
-
-      float row_bcast_time;
-      CUDACHECK(cudaEventElapsedTime(&row_bcast_time, start[0], stop[0]));
-      CUDACHECK(cudaEventSynchronize(stop[0]));
-      row_time += row_bcast_time / 1000;
-
-      CUDACHECK(cudaEventRecord(start[1], 0));
-      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[1], 0));
-      cudaDeviceSynchronize();
-      CUDACHECK(cudaEventRecord(stop[1], 0));
-
-      float col_bcast_time;
-      CUDACHECK(cudaEventElapsedTime(&col_bcast_time, start[1], stop[1]));
-      CUDACHECK(cudaEventSynchronize(stop[1]));
-      col_time += col_bcast_time / 1000;
     }
+    NCCLCHECK(ncclGroupEnd());
+    cudaDeviceSynchronize();
+    CUDACHECK(cudaEventRecord(stop[0], 0));
+
+    float row_bcast_time;
+    CUDACHECK(cudaEventElapsedTime(&row_bcast_time, start[0], stop[0]));
+    CUDACHECK(cudaEventSynchronize(stop[0]));
+    row_time += row_bcast_time / 1000;
+
+    CUDACHECK(cudaEventRecord(start[1], 0));
+    NCCLCHECK(ncclGroupStart());
+    for (int j = 0; j < trials; j++) {
+      NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[1], 0));
+    }
+    NCCLCHECK(ncclGroupEnd());
+    cudaDeviceSynchronize();
+    CUDACHECK(cudaEventRecord(stop[1], 0));
+
+    float col_bcast_time;
+    CUDACHECK(cudaEventElapsedTime(&col_bcast_time, start[1], stop[1]));
+    CUDACHECK(cudaEventSynchronize(stop[1]));
+    col_time += col_bcast_time / 1000;
   }
-  // NCCLCHECK(ncclGroupEnd());
 
   CUDACHECK(cudaEventRecord(stop[2], 0));
   CUDACHECK(cudaEventSynchronize(stop[0]));
