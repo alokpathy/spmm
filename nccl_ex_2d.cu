@@ -37,17 +37,15 @@
 
 int main(int argc, char** argv) {
 
-  if(argc < 4) {
+  if(argc < 3) {
       std::cout << "Usage: ./nccl_ex_2d <datasize> <gpus/node> <proccount>" << std::endl;
       return 0;
   }
 
   int n;
-  int ngpus;
   int nprocs;
   n = atoi(argv[1]);
-  ngpus = atoi(argv[2]); // will always be 1 -- 1 process / gpu
-  nprocs = atoi(argv[3]);
+  nprocs = atoi(argv[2]);
   n *= 1000;
 
   int rank, size;
