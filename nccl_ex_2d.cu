@@ -38,7 +38,7 @@
 int main(int argc, char** argv) {
 
   if(argc < 3) {
-      std::cout << "Usage: ./nccl_ex_2d <datasize> <gpus/node> <proccount>" << std::endl;
+      std::cout << "Usage: ./nccl_ex_2d <datasize> <proccount>" << std::endl;
       return 0;
   }
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
   int deviceCount = 0;
   cudaGetDeviceCount(&deviceCount);
 
-  int local_gpuid = rank % 6;
+  int local_gpuid = rank % 3;
   // int local_gpuid = rank % 1;
   CUDACHECK(cudaSetDevice(local_gpuid));
 
@@ -117,15 +117,10 @@ int main(int argc, char** argv) {
   cudaEvent_t start[3]; // row, col, overall
   cudaEvent_t stop[3]; // row, col, overall
 
-  // CUDACHECK(cudaMalloc(&recvbuff, n * sizeof(float)));
-  // CUDACHECK(cudaMalloc(&sendbuff, n * sizeof(float)));
-  // CUDACHECK(cudaMemcpy(sendbuff, h_data, n * sizeof(float), cudaMemcpyHostToDevice));
-
-  // CUDACHECK(cudaMemset(recvbuff, 0, n * sizeof(float)));
-  CUDACHECK(cudaMalloc(&recvbuff, n * sizeof(double)));
   CUDACHECK(cudaMalloc(&sendbuff, n * sizeof(double)));
   CUDACHECK(cudaMemcpy(sendbuff, h_data, n * sizeof(double), cudaMemcpyHostToDevice));
 
+  CUDACHECK(cudaMalloc(&recvbuff, n * sizeof(double)));
   CUDACHECK(cudaMemset(recvbuff, 0, n * sizeof(double)));
 
   cudaStream_t* s = (cudaStream_t*)malloc(sizeof(cudaStream_t)*2);
@@ -182,7 +177,6 @@ int main(int argc, char** argv) {
 
   MPI_Barrier(mpi_new_world);
 
-  // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
   CUDACHECK(cudaEventRecord(start[2], 0));
   
   // 2D SUMMA
@@ -193,6 +187,8 @@ int main(int argc, char** argv) {
   for (int i = 0; i < procdim; i++) {
 
     CUDACHECK(cudaEventRecord(start[0], 0));
+
+    // Call ncclBroadcast (ncclGroup* calls make this function as one ncclBroadcast call).
     NCCLCHECK(ncclGroupStart());
     for (int j = 0; j < trials; j++) {
       NCCLCHECK(ncclBroadcast((const void*)sendbuff, (void*)recvbuff, n, ncclDouble, i, comms[0], 0));

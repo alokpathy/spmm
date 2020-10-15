@@ -14,7 +14,7 @@ def main():
         datasize = -1
         bandwidths = []
         for line in f:
-            if "Success" in line or "Hostname" in line or "Warning" in line:
+            if "Success" in line or "Hostname" in line or "Warning" in line or "local_gpuid" in line or "bcast1d_time" in line:
                 continue
 
             tokens = line.strip().split()
