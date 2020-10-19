@@ -26,7 +26,7 @@
   }                                                 \
 } while(0)
 
-#define CUDA_AWARE
+// #define CUDA_AWARE
 
 int main(int argc, char** argv) {
 

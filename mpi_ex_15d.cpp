@@ -26,7 +26,7 @@
   }                                                 \
 } while(0)
 
-#define CUDA_AWARE
+// #define CUDA_AWARE
 
 int main(int argc, char** argv) {
 
@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
   CUDACHECK(cudaMalloc(&recvbuff, n * procdim * sizeof(double)));
 #else
   sendbuff = h_data;
+  recvbuff = new double[n * procdim]();
 #endif
 
   // 1D bcast on MPI_COMM_WORLD
@@ -157,18 +158,20 @@ int main(int argc, char** argv) {
   }
 
 #ifdef CUDA_AWARE
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " gpu_time: " << total_time << " bw: " << ((n * sizeof(double) + procdim * n * sizeof(double)) / total_time) << std::endl;
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " gpu_time: " << total_time << " bw: " << ((2 * procdim * n * sizeof(double)) / total_time) << std::endl;
 #else
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " cpu_time: " << total_time << " bw: " << ((n * sizeof(double) + procdim * n * sizeof(double)) / total_time) << std::endl;
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " cpu_time: " << total_time << " bw: " << ((2 * procdim * n * sizeof(double)) / total_time) << std::endl;
 #endif
-  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " row_time: " << row_time << " bw: " << ((n * sizeof(double)) / row_time) << std::endl;
+  std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " row_time: " << row_time << " bw: " << ((procdim * n * sizeof(double)) / row_time) << std::endl;
   std::cout << "rank: " << rank << " size: " << (n * sizeof(double)) << " col_time: " << col_time << " bw: " << ((procdim * n * sizeof(double)) / col_time) << std::endl;
 
 #ifdef CUDA_AWARE
   // Freeing device memory
   CUDACHECK(cudaFree(sendbuff));
+  CUDACHECK(cudaFree(recvbuff));
 #else
   delete[] sendbuff;
+  delete[] recvbuff;
 #endif
 
   // Finalizing MPI
