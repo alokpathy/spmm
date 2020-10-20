@@ -3,7 +3,8 @@ procdim=$2
 library=$3
 exp=$4
 
-procdim=$((2 * procdim))
+procdim=$((2 * procdim)) # one resource set per socket, 2 sockets per node
+
 if [ "$library" = "mpi" ]; then
     nvcc -I$MPI_ROOT/include -L$MPI_ROOT/lib -lmpi_ibm mpi_ex_$exp\.cpp -o mpi_ex_$exp
 elif [ "$library" = "mpi_cpu" ]; then
@@ -21,7 +22,7 @@ for i in {1..13}
         if [ "$library" = "mpi" ]; then
             jsrun -n$procdim -a3 -g3 --smpiargs="-gpu" ./mpi_ex_$exp $(echo 2^$i | bc) 3 $proccount >> mpi_$exp\_results/proc$proccount\.txt
         elif [ "$library" = "mpi_cpu" ]; then
-            jsrun -n$procdim -a6 -c7 ./mpi_ex_$exp $(echo 2^$i | bc) 6 $proccount >> mpi_cpu_$exp\_results/proc$proccount\.txt
+            jsrun -n$procdim -a3 -c21 ./mpi_ex_$exp $(echo 2^$i | bc) 3 $proccount >> mpi_cpu_$exp\_results/proc$proccount\.txt
         elif [ "$library" = "nccl" ]; then
             jsrun -n$procdim -a3 -g3 ./nccl_ex_$exp $(echo 2^$i | bc) 3 $proccount >> nccl_$exp\_results/proc$proccount\.txt
         fi
