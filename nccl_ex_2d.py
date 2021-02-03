@@ -11,6 +11,8 @@ import torch.multiprocessing as mp
 
 from sparse_coo_tensor_cpp import sparse_coo_tensor_gpu, spmm_gpu
 
+import time
+
 def summa_sparse(adj_matrix, inputs, rank, row, col, size, acc_per_rank, row_groups, col_groups, 
                     height, middim, width):
 
@@ -212,10 +214,15 @@ def twod_partition(rank, size, inputs, adj_matrix, device):
     print(inputs_loc.size(), flush=True)
     return inputs_loc, adj_matrix_loc, am_pbyp
 
-def main(mata_indices_path, matb_path, acc_per_rank):
+def main(mata_indices_path, k, acc_per_rank):
     # Load matrices as pytorch tensors
     mata_indices = torch.load(mata_indices_path)
-    matb = torch.load(matb_path)
+    if not isinstance(mata_indices, torch.Tensor): # if Reddit/Cora
+        mata_indices = mata_indices[0].edge_index
+    print(mata_indices)
+
+    node_count = torch.max(mata_indices[0])
+    matb = torch.rand(node_count, k)
 
     # Initialize distributed environment
     mp.set_start_method('spawn', force=True)
@@ -253,8 +260,15 @@ def main(mata_indices_path, matb_path, acc_per_rank):
     matb_loc = matb_loc.to(device)
     mata_loc = mata_loc.to(device)
 
+    dist.barrier(group)
+
+    if rank == 0:
+        summa_start_time = time.time()
     z = summa_sparse(mata_loc, matb_loc, rank, rank_row, rank_col, size, acc_per_rank, 
                         row_groups, col_groups, matb.size(0), matb.size(0), matb.size(1))
+    dist.barrier(group)
+    if rank == 0:
+        print(f"summa_time: {time.time() - summa_start_time}")
     
     print(z)
     print(torch.sum(z))
@@ -262,14 +276,12 @@ def main(mata_indices_path, matb_path, acc_per_rank):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--mata-indices", type=str)
-    parser.add_argument("--matb", type=str)
+    parser.add_argument("--k", type=int)
     parser.add_argument("--accperrank", type=int)
 
     args = parser.parse_args()
-    print(args)
 
     mata_indices_path = args.mata_indices
-    matb_path = args.matb
     acc_per_rank = args.accperrank
 
-    main(mata_indices_path, matb_path, acc_per_rank)
+    main(mata_indices_path, args.k, acc_per_rank)

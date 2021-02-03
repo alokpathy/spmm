@@ -1,0 +1,100 @@
++ export WORLD_SIZE='4' ; export MASTER_ADDR='h27n11' ; export MASTER_PORT='1234' ; export CSM_ALLOCATION_ID='1776098' ; export LSB_MCPU_HOSTS='batch2 1 h27n11 42' ; export PYTHONPATH='/sw/summit/xalt/1.2.1/site:/sw/summit/xalt/1.2.1/libexec' ; export LSB_JOBID='709908' ; export LD_LIBRARY_PATH='/sw/summit/cuda/11.2.0/lib64:/ccs/home/alokt/SuiteSparse/GraphBLAS/build:/opt/ibm/spectrumcomputing/lsf/10.1.0.9/linux3.10-glibc2.17-ppc64le-csm/lib:/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/gcc-4.8.5/darshan-runtime-3.1.7-cnvxicgf5j4ap64qi6v5gxp67hmrjz43/lib:/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-5/spectrum-mpi-10.3.1.2-20200121-p6nrnt6vtvkn356wqg6f74n6jspnpjd2/lib:/sw/summit/xl/16.1.1-5/xlsmp/5.1.1/lib:/sw/summit/xl/16.1.1-5/xlmass/9.1.1/lib:/sw/summit/xl/16.1.1-5/xlC/16.1.1/lib:/sw/summit/xl/16.1.1-5/xlf/16.1.1/lib:/sw/summit/xl/16.1.1-5/lib:/opt/ibm/spectrum_mpi/jsm_pmix/lib:/ccs/home/alokt/.conda/envs/gnn/extras/CUPTI/lib64::/ccs/home/alokt/.conda/envs/gnn/cuda/lib:/ccs/home/alokt/.conda/envs/gnn/lib/python3.6/site-packages/tensorflow_core' ; export PATH='/sw/sources/lsf-tools/2.0/summit/bin:/sw/summit/xalt/1.2.1/bin:/sw/summit/cuda/11.2.0/bin:/ccs/home/alokt/.conda/envs/gnn/bin:/autofs/nccs-svm1_sw/summit/.swci/0-core/opt/spack/20180914/linux-rhel7-ppc64le/gcc-4.8.5/tmux-2.2-z2cgytxdo3rzw643uj2fiwp7iwqbbbwp/bin:/opt/ibm/spectrumcomputing/lsf/10.1.0.9/linux3.10-glibc2.17-ppc64le-csm/bin:/opt/ibm/csm/bin:/sw/summit/python/3.6/anaconda3/5.3.0/condabin:/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/gcc-4.8.5/darshan-runtime-3.1.7-cnvxicgf5j4ap64qi6v5gxp67hmrjz43/bin:/sw/sources/hpss/bin:/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-5/spectrum-mpi-10.3.1.2-20200121-p6nrnt6vtvkn356wqg6f74n6jspnpjd2/bin:/sw/summit/xl/16.1.1-5/xlC/16.1.1/bin:/sw/summit/xl/16.1.1-5/xlf/16.1.1/bin:/opt/ibm/spectrumcomputing/lsf/10.1.0.9/linux3.10-glibc2.17-ppc64le-csm/etc:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/ibm/flightlog/bin:/opt/ibutils/bin:/opt/ibm/spectrum_mpi/jsm_pmix/bin:/opt/puppetlabs/bin:/usr/lpp/mmfs/bin:/ccs/home/alokt/.fzf/bin' ; export DDL_HOST_PORT='2200' ; export DDL_HOST_LIST='' ; export DDL_OPTIONS='-mode p:4x1x1x1 ' ; /sw/summit/xalt/1.2.1/bin/jsrun --erf_input /tmp/DDLRUN/DDLRUN.d5JAl0PdHPUH/RANKFILE bash -c 'source /sw/summit/python/3.6/anaconda3/5.3.0/etc/profile.d/conda.sh && conda activate /ccs/home/alokt/.conda/envs/gnn > /dev/null 2>&1 && python nccl_ex.py --mata-indices=../data/Reddit/processed/data.pt --k=256 --accperrank=4 --replication=2 --timing=False'
+Namespace(accperrank=4, k=256, mata_indices='../data/Reddit/processed/data.pt', replication=2, timing='False')
+tensor([[     0,      0,      0,  ..., 232964, 232964, 232964],
+        [   242,    249,    524,  ..., 231806, 232594, 232634]])
+Processes: 4
+curr_devid: 1
+Namespace(accperrank=4, k=256, mata_indices='../data/Reddit/processed/data.pt', replication=2, timing='False')
+tensor([[     0,      0,      0,  ..., 232964, 232964, 232964],
+        [   242,    249,    524,  ..., 231806, 232594, 232634]])
+Processes: 4
+curr_devid: 2
+Namespace(accperrank=4, k=256, mata_indices='../data/Reddit/processed/data.pt', replication=2, timing='False')
+tensor([[     0,      0,      0,  ..., 232964, 232964, 232964],
+        [   242,    249,    524,  ..., 231806, 232594, 232634]])
+Processes: 4
+curr_devid: 3
+Namespace(accperrank=4, k=256, mata_indices='../data/Reddit/processed/data.pt', replication=2, timing='False')
+tensor([[     0,      0,      0,  ..., 232964, 232964, 232964],
+        [   242,    249,    524,  ..., 231806, 232594, 232634]])
+Processes: 4
+curr_devid: 0
+rank: 1 replication: 2 rank_c: 0 len_vtxind: 3
+rank: 1 adj_matrix_loc.size: torch.Size([232965, 116483])
+rank: 1 inputs_loc.size: torch.Size([116483, 256])
+rank: 2 replication: 2 rank_c: 1 len_vtxind: 3
+rank: 2 adj_matrix_loc.size: torch.Size([232965, 116482])
+rank: 2 inputs_loc.size: torch.Size([116482, 256])
+rank: 0 replication: 2 rank_c: 0 len_vtxind: 3
+rank: 0 adj_matrix_loc.size: torch.Size([232965, 116483])
+rank: 0 inputs_loc.size: torch.Size([116483, 256])
+rank: 3 replication: 2 rank_c: 1 len_vtxind: 3
+rank: 3 adj_matrix_loc.size: torch.Size([232965, 116482])
+rank: 3 inputs_loc.size: torch.Size([116482, 256])
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+CUSPARSE API failed at line 180 with error: operation not supported (10)
+CUSPARSE API failed at line 190 with error: operation not supported (10)
+CUSPARSE API failed at line 221 with error: initialization error (1)
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+CUSPARSE API failed at line 180 with error: operation not supported (10)
+CUSPARSE API failed at line 190 with error: operation not supported (10)
+CUSPARSE API failed at line 221 with error: initialization error (1)
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+CUSPARSE API failed at line 180 with error: operation not supported (10)
+CUSPARSE API failed at line 190 with error: operation not supported (10)
+CUSPARSE API failed at line 221 with error: initialization error (1)
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+ ** On entry to cusparseCreateDnMat() row-major layout is not currently supported 
+CUSPARSE API failed at line 180 with error: operation not supported (10)
+CUSPARSE API failed at line 190 with error: operation not supported (10)
+CUSPARSE API failed at line 221 with error: initialization error (1)
+/ccs/home/alokt/.conda/envs/gnn/lib/python3.6/site-packages/torch/distributed/distributed_c10d.py:108: UserWarning: torch.distributed.reduce_op is deprecated, please use torch.distributed.ReduceOp instead
+  warnings.warn("torch.distributed.reduce_op is deprecated, please use "
+summa_time: 1.7852602005004883
+rank: 0 comm_time: 0.0
+rank: 0 comp_time: 0.0
+rank: 0 bcast_comm_time: 0.0
+rank: 0 reduce_comm_time: 0.0
+Traceback (most recent call last):
+  File "nccl_ex.py", line 274, in <module>
+    main(mata_indices_path, args.k, acc_per_rank, replication)
+  File "nccl_ex.py", line 252, in main
+    print(f"rank: {rank} {outputs}")
+NameError: name 'outputs' is not defined
+/ccs/home/alokt/.conda/envs/gnn/lib/python3.6/site-packages/torch/distributed/distributed_c10d.py:108: UserWarning: torch.distributed.reduce_op is deprecated, please use torch.distributed.ReduceOp instead
+  warnings.warn("torch.distributed.reduce_op is deprecated, please use "
+tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:1')
+tensor(0., device='cuda:1')
+/ccs/home/alokt/.conda/envs/gnn/lib/python3.6/site-packages/torch/distributed/distributed_c10d.py:108: UserWarning: torch.distributed.reduce_op is deprecated, please use torch.distributed.ReduceOp instead
+  warnings.warn("torch.distributed.reduce_op is deprecated, please use "
+tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:3')
+tensor(0., device='cuda:3')
+/ccs/home/alokt/.conda/envs/gnn/lib/python3.6/site-packages/torch/distributed/distributed_c10d.py:108: UserWarning: torch.distributed.reduce_op is deprecated, please use torch.distributed.ReduceOp instead
+  warnings.warn("torch.distributed.reduce_op is deprecated, please use "
+tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:2')
+tensor(0., device='cuda:2')
+CUDA Hook Library: Failed to find symbol mem_find_dreg_entries, python: undefined symbol: __PAMI_Invalidate_region
+CUDA Hook Library: Failed to find symbol mem_find_dreg_entries, python: undefined symbol: __PAMI_Invalidate_region
+CUDA Hook Library: Failed to find symbol mem_find_dreg_entries, python: undefined symbol: __PAMI_Invalidate_region
+CUDA Hook Library: Failed to find symbol mem_find_dreg_entries, python: undefined symbol: __PAMI_Invalidate_region

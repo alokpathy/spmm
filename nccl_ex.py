@@ -3,15 +3,46 @@
 
 import argparse
 import math
-import torch
 import os
+import time
+import torch
 
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
 from sparse_coo_tensor_cpp import spmm_gpu
 
+comp_time = dict()
+comm_time = dict()
+bcast_comm_time = dict()
+reduce_comm_time = dict()
+timing = False
+
+def start_time(group, rank):
+    if not timing:
+        return 0.0
+    if group is not None:
+        torch.cuda.synchronize(device=device)
+    tstart = 0.0
+    if rank == 0:
+        tstart = time.time()
+    return tstart
+
+def stop_time(group, rank, tstart):
+    if not timing:
+        return 0.0
+    if group is not None:
+        torch.cuda.synchronize(device=device)
+    tstop = 0.0
+    if rank == 0:
+        tstop = time.time()
+    return tstop - tstart
+
 def dspmm(node_count, am_partitions, inputs, rank, size, replication, row_groups, col_groups, group, device):
+    global comm_time
+    global comp_time
+    global bcast_comm_time
+    global reduce_comm_time
 
     n_per_proc = math.ceil(float(node_count) / (size / replication))
 
@@ -42,15 +73,30 @@ def dspmm(node_count, am_partitions, inputs, rank, size, replication, row_groups
             inputs_recv = torch.cuda.FloatTensor(am_partitions[am_partid].size(1), inputs.size(1), device=device).fill_(0)
 
         inputs_recv = inputs_recv.contiguous()
+        tstart_comm = start_time(col_groups[rank_col], rank)
         dist.broadcast(inputs_recv, src=q, group=col_groups[rank_col])
+        dur = stop_time(col_groups[rank_col], rank, tstart_comm)
+
+        comm_time[rank] += dur
+        bcast_comm_time[rank] += dur
+
+        tstart_comp = start_time(col_groups[rank_col], rank)
 
         spmm_gpu(am_partitions[am_partid].indices()[0].int(), am_partitions[am_partid].indices()[1].int(), 
                         am_partitions[am_partid].values(), am_partitions[am_partid].size(0), 
                         am_partitions[am_partid].size(1), inputs_recv, z_loc)
 
+        dur = stop_time(col_groups[rank_col], rank, tstart_comp)
+        comp_time[rank] += dur
+
     z_loc = z_loc.contiguous()
 
+    tstart_comm = start_time(row_groups[rank_c], rank)
     dist.all_reduce(z_loc, op=dist.reduce_op.SUM, group=row_groups[rank_c])
+    dur = stop_time(row_groups[rank_c], rank, tstart_comm)
+
+    comm_time[rank] += dur
+    reduce_comm_time[rank] += dur
 
     return z_loc
 
@@ -93,6 +139,7 @@ def oned_partition(rank, size, inputs, adj_matrix, replication, device):
         # Column partitions
         am_partitions, vtx_indices = split_coo(adj_matrix, node_count, n_per_proc, 1)
 
+        print(f"rank: {rank} replication: {replication} rank_c: {rank_c} len_vtxind: {len(vtx_indices)}")
         proc_node_count = vtx_indices[rank_c + 1] - vtx_indices[rank_c]
         am_pbyp, _ = split_coo(am_partitions[rank_c], node_count, n_per_proc, 0)
         for i in range(len(am_pbyp)):
@@ -138,10 +185,15 @@ def split_coo(adj_matrix, node_count, n_per_proc, dim):
 
     return am_partitions, vtx_indices
 
-def main(mata_indices_path, matb_path, acc_per_rank, replication):
+def main(mata_indices_path, k, acc_per_rank, replication):
     # Load matrices as pytorch tensors
     mata_indices = torch.load(mata_indices_path)
-    matb = torch.load(matb_path)
+    if not isinstance(mata_indices, torch.Tensor): # if Reddit/Cora
+        mata_indices = mata_indices[0].edge_index
+    print(mata_indices)
+
+    node_count = torch.max(mata_indices[0]) + 1
+    matb = torch.rand(node_count, k)  
 
     # Initialize process groups
     mp.set_start_method('spawn', force=True)
@@ -163,6 +215,10 @@ def main(mata_indices_path, matb_path, acc_per_rank, replication):
     group = dist.new_group(list(range(size)))
     row_groups, col_groups = get_proc_groups(rank, size, replication) 
 
+    rank_c = rank // replication
+    if rank_c >= (size // replication):
+        return
+
     # Partition both input matrices across process grid and get local mata and matb copies
     matb_loc, mata_loc, mata_pbyp = oned_partition(rank, size, matb, mata_indices, replication, device)
 
@@ -172,11 +228,28 @@ def main(mata_indices_path, matb_path, acc_per_rank, replication):
         mata_pbyp[i] = mata_pbyp[i].t().coalesce().to(device)
     mata_loc = mata_loc.coalesce()
 
+    comm_time[rank] = 0.0
+    comp_time[rank] = 0.0
+    bcast_comm_time[rank] = 0.0
+    reduce_comm_time[rank] = 0.0
+
     dist.barrier(group)
+
+    if rank == 0:
+        summa_start_time = time.time()
 
     # Call 1.5D distributed SpMM algorithm
     z = dspmm(mata_loc.size(0), mata_pbyp, matb_loc, rank, size, replication, \
                             row_groups, col_groups, group, device)
+
+    dist.barrier(group)
+    if rank == 0:
+        print(f"summa_time: {time.time() - summa_start_time}")
+        print(f"rank: {rank} comm_time: {comm_time[rank]}")
+        print(f"rank: {rank} comp_time: {comp_time[rank]}")
+        print(f"rank: {rank} bcast_comm_time: {bcast_comm_time[rank]}")
+        print(f"rank: {rank} reduce_comm_time: {reduce_comm_time[rank]}")
+        print(f"rank: {rank} {outputs}")
 
     print(z)
     print(torch.sum(z))
@@ -185,16 +258,17 @@ def main(mata_indices_path, matb_path, acc_per_rank, replication):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--mata-indices", type=str)
-    parser.add_argument("--matb", type=str)
+    parser.add_argument("--k", type=int)
     parser.add_argument("--accperrank", type=int)
     parser.add_argument("--replication", type=int)
+    parser.add_argument("--timing", type=str)
 
     args = parser.parse_args()
     print(args)
 
     mata_indices_path = args.mata_indices
-    matb_path = args.matb
     acc_per_rank = args.accperrank
     replication = args.replication
+    timing = args.timing == "True"
 
-    main(mata_indices_path, matb_path, acc_per_rank, replication)
+    main(mata_indices_path, args.k, acc_per_rank, replication)
